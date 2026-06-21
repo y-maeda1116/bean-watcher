@@ -1,0 +1,11 @@
+{
+  "grams_per_cup": 12,
+  "low_days_threshold": 5,
+  "critical_days_threshold": 2,
+  "avg_window_days": 7,
+  "fallback_cups_per_day": 2,
+  "maintenance": {
+    "descaling": { "threshold_days": 30, "threshold_shots": 200 },
+    "grinder":   { "threshold_days": 7,  "threshold_shots": 30 }
+  }
+}

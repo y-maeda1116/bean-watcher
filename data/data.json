@@ -1,0 +1,9 @@
+{
+  "beans": { "remaining_grams": 0 },
+  "usage": { "total_shots": 0, "daily_records": [] },
+  "maintenance": {
+    "descaling": { "last_date": "", "last_shots": 0 },
+    "grinder":   { "last_date": "", "last_shots": 0 }
+  },
+  "notify_state": { "beans": "OK", "descaling": "OK", "grinder": "OK" }
+}
