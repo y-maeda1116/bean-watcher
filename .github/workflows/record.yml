@@ -1,0 +1,59 @@
+name: record
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "記録するアクション"
+        required: true
+        type: choice
+        default: pour
+        options:
+          - pour
+          - clean
+          - buy
+      cups:
+        description: "杯数 (pour のみ)"
+        required: false
+        default: "1"
+      target:
+        description: "掃除対象 (clean のみ): descaling / grinder"
+        required: false
+        default: "descaling"
+      grams:
+        description: "購入量g (buy のみ)"
+        required: false
+        default: "200"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bean-watcher
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Build
+        run: go build -o bean-watcher .
+      - name: Run record
+        run: |
+          case "${{ github.event.inputs.action }}" in
+            pour)  ./bean-watcher record pour  -cups=${{ github.event.inputs.cups }} ;;
+            clean) ./bean-watcher record clean -target=${{ github.event.inputs.target }} ;;
+            buy)   ./bean-watcher record buy   -grams=${{ github.event.inputs.grams }} ;;
+          esac
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/data.json
+          git commit -m "chore(data): ${{ github.event.inputs.action }} を記録 [skip ci]" || echo "no changes"
+          git push
