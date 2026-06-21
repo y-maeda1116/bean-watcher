@@ -1,0 +1,6 @@
+# Serena tooling (local)
+.serena/
+
+# Go build artifacts
+/bean-watcher
+*.exe
