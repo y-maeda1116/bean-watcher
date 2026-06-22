@@ -13,6 +13,7 @@ import (
 	"bean-watcher/internal/notify"
 	"bean-watcher/internal/record"
 	"bean-watcher/internal/store"
+	"bean-watcher/internal/summary"
 )
 
 const (
@@ -59,18 +60,19 @@ func runRecord(args []string) {
 		d, err = record.Clean(d, today, *target)
 	case "buy":
 		fs := flag.NewFlagSet("buy", flag.ExitOnError)
-		grams := fs.Int("grams", 0, "grams purchased")
+		bags := fs.Int("bags", 0, "number of bags purchased")
 		fs.Parse(args[1:])
-		if *grams <= 0 {
-			log.Fatalf("invalid grams: must be positive, got %d", *grams)
+		if *bags <= 0 {
+			log.Fatalf("invalid bags: must be positive, got %d", *bags)
 		}
-		d, err = record.AddBeans(d, cfg, today, *grams)
+		d, err = record.AddBags(d, cfg, today, *bags)
 	default:
 		log.Fatalf("unknown record action: %s", sub)
 	}
 	if err != nil {
 		log.Fatalf("record: %v", err)
 	}
+	d.Summary = summary.Compute(d, cfg, today)
 	mustSaveData(dataPath, d)
 }
 
@@ -105,6 +107,7 @@ func runNotify(args []string) {
 		ns.Grinder = d.NotifyState.Grinder
 	}
 	d.NotifyState = ns
+	d.Summary = summary.Compute(d, cfg, today)
 	mustSaveData(dataPath, d)
 }
 
