@@ -8,6 +8,7 @@ type Config struct {
 	CriticalDaysThreshold int              `json:"critical_days_threshold"`
 	AvgWindowDays         int              `json:"avg_window_days"`
 	FallbackCupsPerDay    float64          `json:"fallback_cups_per_day"`
+	BagGrams              int              `json:"bag_grams"`
 	Maintenance           MaintenanceConfig `json:"maintenance"`
 }
 
@@ -28,6 +29,8 @@ type Data struct {
 	Beans       Beans       `json:"beans"`
 	Usage       Usage       `json:"usage"`
 	Maintenance Maintenance `json:"maintenance"`
+	Purchases   []Purchase  `json:"purchases"`
+	Summary     Summary     `json:"summary"`
 	NotifyState NotifyState `json:"notify_state"`
 }
 
@@ -65,4 +68,27 @@ type NotifyState struct {
 	Beans     string `json:"beans"`
 	Descaling string `json:"descaling"`
 	Grinder   string `json:"grinder"`
+}
+
+// Purchase は豆の購入履歴1件。
+type Purchase struct {
+	Date  string `json:"date"` // YYYY-MM-DD
+	Bags  int    `json:"bags"`
+	Grams int    `json:"grams"`
+}
+
+// Summary はウェブダッシュボード表示用の計算結果（Go 側で計算して保存）。
+type Summary struct {
+	RemainingGrams        float64 `json:"remaining_grams"`
+	RemainingBags         float64 `json:"remaining_bags"`
+	BeansLevel            string  `json:"beans_level"`
+	PredictedDays         float64 `json:"predicted_days"`
+	AvgCupsPerDay         float64 `json:"avg_cups_per_day"`
+	DescalingLevel        string  `json:"descaling_level"`
+	DescalingDaysElapsed  int     `json:"descaling_days_elapsed"`
+	DescalingShotsElapsed int     `json:"descaling_shots_elapsed"`
+	GrinderLevel          string  `json:"grinder_level"`
+	GrinderDaysElapsed    int     `json:"grinder_days_elapsed"`
+	GrinderShotsElapsed   int     `json:"grinder_shots_elapsed"`
+	UpdatedAt             string  `json:"updated_at"`
 }

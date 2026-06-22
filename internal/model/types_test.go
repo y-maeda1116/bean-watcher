@@ -18,6 +18,10 @@ func TestDataRoundTrip(t *testing.T) {
 			Descaling: MaintenanceState{LastDate: "2026-06-01", LastShots: 0},
 			Grinder:   MaintenanceState{LastDate: "", LastShots: 0},
 		},
+		Purchases: []Purchase{
+			{Date: "2026-06-01", Bags: 1, Grams: 200},
+		},
+		Summary: Summary{RemainingGrams: 300, RemainingBags: 1.5, BeansLevel: "OK", PredictedDays: 12.5},
 		NotifyState: NotifyState{Beans: "OK", Descaling: "OK", Grinder: "OK"},
 	}
 	raw, err := json.Marshal(src)
@@ -37,8 +41,17 @@ func TestDataRoundTrip(t *testing.T) {
 	if got.Maintenance.Grinder.LastDate != "" {
 		t.Errorf("grinder last_date: got %q, want empty", got.Maintenance.Grinder.LastDate)
 	}
+	if len(got.Purchases) != 1 || got.Purchases[0].Bags != 1 || got.Purchases[0].Grams != 200 {
+		t.Errorf("purchases: got %+v", got.Purchases)
+	}
+	if got.Summary.BeansLevel != "OK" || got.Summary.RemainingBags != 1.5 {
+		t.Errorf("summary: got %+v", got.Summary)
+	}
 	// JSON キー名の確認
 	if want := `"remaining_grams"`; !contains(string(raw), want) {
+		t.Errorf("json key %s missing in %s", want, string(raw))
+	}
+	if want := `"purchases"`; !contains(string(raw), want) {
 		t.Errorf("json key %s missing in %s", want, string(raw))
 	}
 }
