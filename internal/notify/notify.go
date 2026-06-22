@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"bean-watcher/internal/dateutil"
 	"bean-watcher/internal/level"
 	"bean-watcher/internal/model"
 )
@@ -87,37 +86,21 @@ func BuildMessage(d model.Data, cfg model.Config, cur Levels, diff Diff, today s
 
 // beanLine は豆の警告行を生成する。
 func beanLine(d model.Data, cfg model.Config, lvl, today string) string {
-	avg := avgCups(d, cfg, today)
+	avg := level.AvgCupsPerDay(d, cfg, today)
 	gramsPerDay := float64(cfg.GramsPerCup) * avg
 	if gramsPerDay < 0.001 {
 		gramsPerDay = 0.001
 	}
 	days := d.Beans.RemainingGrams / gramsPerDay
 	grams := int(d.Beans.RemainingGrams)
+	bags := 0.0
+	if cfg.BagGrams > 0 {
+		bags = d.Beans.RemainingGrams / float64(cfg.BagGrams)
+	}
 	switch lvl {
 	case level.BeanCRITICAL:
-		return fmt.Sprintf("🚨 **豆がもうすぐ切れます**: あと約%.0f日（残り %dg）。早めの補充をお願いします！", days, grams)
+		return fmt.Sprintf("🚨 **豆がもうすぐ切れます**: あと約%.0f日（残り %dg / %.1f袋）。早めの補充をお願いします！", days, grams, bags)
 	default: // LOW
-		return fmt.Sprintf("☕ **豆の買い時**: あと約%.0f日でなくなりそうです（残り %dg）。週末に焙煎・購入を！", days, grams)
+		return fmt.Sprintf("☕ **豆の買い時**: あと約%.0f日でなくなりそうです（残り %dg / %.1f袋）。週末に焙煎・購入を！", days, grams, bags)
 	}
-}
-
-func avgCups(d model.Data, cfg model.Config, today string) float64 {
-	// level パッケージと同等の計算（dateutil を再利用）
-	start, err := dateutil.WindowStart(today, cfg.AvgWindowDays)
-	if err != nil {
-		return cfg.FallbackCupsPerDay
-	}
-	total := 0
-	hasData := false
-	for _, r := range d.Usage.DailyRecords {
-		if r.Date >= start && r.Date <= today {
-			total += r.Cups
-			hasData = true
-		}
-	}
-	if !hasData {
-		return cfg.FallbackCupsPerDay
-	}
-	return float64(total) / float64(cfg.AvgWindowDays)
 }

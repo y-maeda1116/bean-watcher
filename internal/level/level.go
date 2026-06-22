@@ -17,7 +17,7 @@ const (
 
 // Beans は予測残り日数から豆のレベル(OK/LOW/CRITICAL)を返す。
 func Beans(d model.Data, cfg model.Config, today string) string {
-	avg := avgCupsPerDay(d.Usage.DailyRecords, cfg, today)
+	avg := AvgCupsPerDay(d, cfg, today)
 	gramsPerDay := float64(cfg.GramsPerCup) * avg
 	if gramsPerDay <= 0 {
 		gramsPerDay = float64(cfg.GramsPerCup) * cfg.FallbackCupsPerDay
@@ -35,16 +35,16 @@ func Beans(d model.Data, cfg model.Config, today string) string {
 	return BeanOK
 }
 
-// avgCupsPerDay は今日を含む過去 windowDays 日の平均杯数を返す。
+// AvgCupsPerDay は今日を含む過去 windowDays 日の平均杯数を返す。
 // 記録が1件もなければ FallbackCupsPerDay を返す。
-func avgCupsPerDay(records []model.DailyRecord, cfg model.Config, today string) float64 {
+func AvgCupsPerDay(d model.Data, cfg model.Config, today string) float64 {
 	start, err := dateutil.WindowStart(today, cfg.AvgWindowDays)
 	if err != nil {
 		return cfg.FallbackCupsPerDay
 	}
 	total := 0
 	hasData := false
-	for _, r := range records {
+	for _, r := range d.Usage.DailyRecords {
 		if r.Date >= start && r.Date <= today {
 			total += r.Cups
 			hasData = true

@@ -10,7 +10,7 @@ import (
 func cfg() model.Config {
 	return model.Config{
 		GramsPerCup: 12, LowDaysThreshold: 5, CriticalDaysThreshold: 2,
-		AvgWindowDays: 7, FallbackCupsPerDay: 2,
+		AvgWindowDays: 7, FallbackCupsPerDay: 2, BagGrams: 200,
 		Maintenance: model.MaintenanceConfig{
 			Descaling: model.Threshold{ThresholdDays: 30, ThresholdShots: 200},
 			Grinder:   model.Threshold{ThresholdDays: 7, ThresholdShots: 30},
@@ -90,6 +90,9 @@ func TestBuildMessageIncludesBeanWarning(t *testing.T) {
 	}
 	if !strings.Contains(msg, "2日") {
 		t.Errorf("message should mention 2 days: %q", msg)
+	}
+	if !strings.Contains(msg, "袋") {
+		t.Errorf("message should mention bags: %q", msg)
 	}
 }
 
