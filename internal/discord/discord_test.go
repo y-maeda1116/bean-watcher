@@ -44,14 +44,16 @@ func TestSendErrorOnNon2xx(t *testing.T) {
 }
 
 func TestSendMasksURLInError(t *testing.T) {
-	secret := "https://discord.com/api/webhooks/SECRET_TOKEN_123"
-	// 不正なホストで接続エラーを発生させる
-	err := Send(context.Background(), "http://127.0.0.1:0/webhook", "x")
+	// 到達不能な URL に一意トークンを埋め込み、接続エラーを発生させる。
+	// マスク機能が正しく働けば err.Error() に MASKTOKEN123 は現れない。
+	const token = "MASKTOKEN123"
+	url := "http://127.0.0.1:1/webhook/" + token
+	err := Send(context.Background(), url, "x")
 	if err == nil {
 		t.Skip("connection did not fail")
 	}
-	if strings.Contains(err.Error(), "SECRET") || strings.Contains(err.Error(), secret) {
-		t.Errorf("error leaks URL: %v", err)
+	if strings.Contains(err.Error(), token) {
+		t.Errorf("error leaks URL token %q: %v", token, err)
 	}
 }
 
