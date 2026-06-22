@@ -20,10 +20,10 @@ on:
         description: "掃除対象 (clean のみ): descaling / grinder"
         required: false
         default: "descaling"
-      grams:
-        description: "購入量g (buy のみ)"
+      bags:
+        description: "購入袋数 (buy のみ)"
         required: false
-        default: "200"
+        default: "1"
 
 permissions:
   contents: write
@@ -48,12 +48,12 @@ jobs:
           ACTION: ${{ github.event.inputs.action }}
           CUPS: ${{ github.event.inputs.cups }}
           TARGET: ${{ github.event.inputs.target }}
-          GRAMS: ${{ github.event.inputs.grams }}
+          BAGS: ${{ github.event.inputs.bags }}
         run: |
           case "$ACTION" in
             pour)  ./bean-watcher record pour  -cups="$CUPS" ;;
             clean) ./bean-watcher record clean -target="$TARGET" ;;
-            buy)   ./bean-watcher record buy   -grams="$GRAMS" ;;
+            buy)   ./bean-watcher record buy   -bags="$BAGS" ;;
           esac
       - name: Commit data
         env:
@@ -62,5 +62,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/data.json
-          git commit -m "chore(data): $ACTION を記録 [skip ci]" || echo "no changes"
+          git commit -m "chore(data): $ACTION を記録" || echo "no changes"
           git push

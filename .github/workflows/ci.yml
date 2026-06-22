@@ -3,6 +3,10 @@ name: ci
 on:
   push:
     branches: [main, "feat/**"]
+    paths:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
   pull_request:
 
 permissions:
