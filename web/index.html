@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bean-watcher</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="container">
+  <header>
+    <h1>☕ bean-watcher</h1>
+    <span id="updated" class="updated"></span>
+  </header>
+
+  <section id="status" class="card error">
+    <p>データを読み込めませんでした。</p>
+  </section>
+
+  <section id="beans-card" class="card hidden">
+    <div class="row">
+      <span class="label">残量</span>
+      <span id="beans-remaining" class="value"></span>
+      <span id="beans-badge" class="badge"></span>
+    </div>
+    <div class="row sub">
+      <span id="beans-predict"></span>
+    </div>
+  </section>
+
+  <section id="chart-card" class="card hidden">
+    <h2>📉 直近の消費</h2>
+    <div id="chart" class="chart"></div>
+  </section>
+
+  <section id="purchases-card" class="card hidden">
+    <h2>🛒 購入履歴</h2>
+    <ul id="purchases" class="list"></ul>
+  </section>
+
+  <section id="maint-card" class="card hidden">
+    <h2>🧽 メンテナンス</h2>
+    <div class="row"><span class="label">クエン酸洗浄</span><span id="descaling-status" class="maint"></span></div>
+    <div class="row"><span class="label">ミル掃除</span><span id="grinder-status" class="maint"></span></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
