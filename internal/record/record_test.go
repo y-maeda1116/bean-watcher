@@ -7,7 +7,7 @@ import (
 )
 
 func cfg() model.Config {
-	return model.Config{GramsPerCup: 12, AvgWindowDays: 7, FallbackCupsPerDay: 2, LowDaysThreshold: 5}
+	return model.Config{GramsPerCup: 12, AvgWindowDays: 7, FallbackCupsPerDay: 2, LowDaysThreshold: 5, BagGrams: 200}
 }
 
 func baseData() model.Data {
@@ -97,18 +97,31 @@ func TestCleanRejectsUnknownTarget(t *testing.T) {
 	}
 }
 
-func TestAddBeansIncreasesRemainingAndRecomputesLevel(t *testing.T) {
+func TestAddBagsIncreasesAndAppendsPurchase(t *testing.T) {
 	d := baseData()
-	d.Beans.RemainingGrams = 24 // 少量 -> LOW 相当を想定して増やす
-	got, err := AddBeans(d, cfg(), "2026-06-21", 300)
+	d.Beans.RemainingGrams = 24
+	got, err := AddBags(d, cfg(), "2026-06-21", 2) // 2袋 x 200g = 400g
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
-	if got.Beans.RemainingGrams != 324 {
-		t.Errorf("grams: got %v, want 324", got.Beans.RemainingGrams)
+	if got.Beans.RemainingGrams != 424 { // 24 + 400
+		t.Errorf("grams: got %v, want 424", got.Beans.RemainingGrams)
 	}
-	if got.NotifyState.Beans != "OK" { // 324g は十分
+	if got.NotifyState.Beans != "OK" { // 424g は十分
 		t.Errorf("beans level: got %q, want OK", got.NotifyState.Beans)
+	}
+	if len(got.Purchases) != 1 || got.Purchases[0].Bags != 2 || got.Purchases[0].Grams != 400 {
+		t.Errorf("purchase: got %+v", got.Purchases)
+	}
+	// 元データ不変（イミュータブル）
+	if len(d.Purchases) != 0 {
+		t.Error("source purchases was mutated")
+	}
+}
+
+func TestAddBagsRejectsNonPositive(t *testing.T) {
+	if _, err := AddBags(baseData(), cfg(), "2026-06-21", 0); err == nil {
+		t.Error("expected error for bags=0")
 	}
 }
 

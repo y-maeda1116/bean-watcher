@@ -29,6 +29,8 @@ func PourCoffee(d model.Data, cfg model.Config, date string, cups int) (model.Da
 			DailyRecords: updated,
 		},
 		Maintenance: d.Maintenance,
+		Purchases:   d.Purchases,
+		Summary:     d.Summary,
 		NotifyState: d.NotifyState,
 	}, nil
 }
@@ -51,20 +53,28 @@ func Clean(d model.Data, date, target string) (model.Data, error) {
 		Beans:       d.Beans,
 		Usage:       d.Usage,
 		Maintenance: ms,
+		Purchases:   d.Purchases,
+		Summary:     d.Summary,
 		NotifyState: ns,
 	}, nil
 }
 
-// AddBeans は grams の豆購入を記録し、残量を加算して豆レベルを再計算する。
-func AddBeans(d model.Data, cfg model.Config, date string, grams int) (model.Data, error) {
-	if grams <= 0 {
-		return model.Data{}, fmt.Errorf("grams must be positive, got %d", grams)
+// AddBags は bags 袋の豆購入を記録する。残量に bags×bag_grams を加算し、
+// 購入履歴(purchases)に追記し、豆レベルを再計算する。
+func AddBags(d model.Data, cfg model.Config, date string, bags int) (model.Data, error) {
+	if bags <= 0 {
+		return model.Data{}, fmt.Errorf("bags must be positive, got %d", bags)
 	}
+	grams := bags * cfg.BagGrams
 	ns := d.NotifyState
+	purchases := make([]model.Purchase, len(d.Purchases))
+	copy(purchases, d.Purchases)
+	purchases = append(purchases, model.Purchase{Date: date, Bags: bags, Grams: grams})
 	next := model.Data{
 		Beans:       model.Beans{RemainingGrams: d.Beans.RemainingGrams + float64(grams)},
 		Usage:       d.Usage,
 		Maintenance: d.Maintenance,
+		Purchases:   purchases,
 		NotifyState: ns,
 	}
 	ns.Beans = level.Beans(next, cfg, date)
@@ -88,6 +98,8 @@ func Prune(d model.Data, windowDays int, today string) model.Data {
 		Beans:       d.Beans,
 		Usage:       model.Usage{TotalShots: d.Usage.TotalShots, DailyRecords: kept},
 		Maintenance: d.Maintenance,
+		Purchases:   d.Purchases,
+		Summary:     d.Summary,
 		NotifyState: d.NotifyState,
 	}
 }
