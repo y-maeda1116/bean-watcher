@@ -88,7 +88,10 @@ func runNotify(args []string) {
 
 	if msg := notify.BuildMessage(d, cfg, cur, diff, today); msg != "" {
 		webhook := os.Getenv("DISCORD_WEBHOOK_URL")
-		if err := discord.Send(context.Background(), webhook, msg); err != nil {
+		if webhook == "" {
+			// webhook 未設定時は Discord 送信をスキップ（残量計算・保存は継続）
+			log.Printf("notify: DISCORD_WEBHOOK_URL is not set, skipping notification")
+		} else if err := discord.Send(context.Background(), webhook, msg); err != nil {
 			// 送信失敗時は notify_state を更新せず終了（次回リトライ）
 			log.Fatalf("notify send: %v", err)
 		}
