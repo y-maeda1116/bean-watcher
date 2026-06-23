@@ -1,9 +1,39 @@
 {
-  "beans": { "remaining_grams": 0 },
-  "usage": { "total_shots": 0, "daily_records": [] },
-  "maintenance": {
-    "descaling": { "last_date": "", "last_shots": 0 },
-    "grinder":   { "last_date": "", "last_shots": 0 }
+  "beans": {
+    "remaining_grams": 0
   },
-  "notify_state": { "beans": "OK", "descaling": "OK", "grinder": "OK" }
+  "usage": {
+    "total_shots": 0,
+    "daily_records": []
+  },
+  "maintenance": {
+    "descaling": {
+      "last_date": "",
+      "last_shots": 0
+    },
+    "grinder": {
+      "last_date": "",
+      "last_shots": 0
+    }
+  },
+  "purchases": null,
+  "summary": {
+    "remaining_grams": 0,
+    "remaining_bags": 0,
+    "beans_level": "CRITICAL",
+    "predicted_days": 0,
+    "avg_cups_per_day": 2,
+    "descaling_level": "",
+    "descaling_days_elapsed": 0,
+    "descaling_shots_elapsed": 0,
+    "grinder_level": "",
+    "grinder_days_elapsed": 0,
+    "grinder_shots_elapsed": 0,
+    "updated_at": "2026-06-24"
+  },
+  "notify_state": {
+    "beans": "CRITICAL",
+    "descaling": "OK",
+    "grinder": "OK"
+  }
 }
