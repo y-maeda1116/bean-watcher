@@ -111,3 +111,109 @@ async function main() {
 }
 
 main();
+
+// 「買った袋数メモ」: localStorage にだけ保存する入力欄（本番 data.json には反映しない）。
+const MEMO_KEY = "bean-watcher:memo";
+
+function loadMemo() {
+  try {
+    const raw = localStorage.getItem(MEMO_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveMemo(list) {
+  try {
+    localStorage.setItem(MEMO_KEY, JSON.stringify(list));
+  } catch (e) {
+    // localStorage が利用できない環境（プライベートモード等）では何もしない
+  }
+}
+
+function fmtMemoDate(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString("ja-JP", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function renderMemo() {
+  const el = document.getElementById("memo-list");
+  const clearBtn = document.getElementById("memo-clear");
+  if (!el) return;
+  clearChildren(el);
+  const list = loadMemo();
+  if (clearBtn) clearBtn.style.display = list.length === 0 ? "none" : "";
+  if (list.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "まだ記録がありません";
+    el.appendChild(li);
+    return;
+  }
+  list.forEach(function (item, i) {
+    const li = document.createElement("li");
+    li.className = "memo-item";
+    const span = document.createElement("span");
+    span.textContent = fmtMemoDate(item.date) + "  " + item.bags + "袋";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "link-btn";
+    btn.textContent = "削除";
+    btn.addEventListener("click", function () { deleteMemo(i); });
+    li.appendChild(span);
+    li.appendChild(btn);
+    el.appendChild(li);
+  });
+}
+
+function addMemo(bags) {
+  const list = loadMemo();
+  const next = [{ bags: bags, date: new Date().toISOString() }].concat(list);
+  saveMemo(next);
+  renderMemo();
+}
+
+function deleteMemo(index) {
+  const next = loadMemo().filter(function (_, i) { return i !== index; });
+  saveMemo(next);
+  renderMemo();
+}
+
+function clearMemo() {
+  saveMemo([]);
+  renderMemo();
+}
+
+function initMemo() {
+  const input = document.getElementById("memo-bags");
+  const addBtn = document.getElementById("memo-add");
+  const clearBtn = document.getElementById("memo-clear");
+  if (!input || !addBtn) return;
+
+  const submit = function () {
+    const v = parseInt(input.value, 10);
+    if (!Number.isFinite(v) || v <= 0) {
+      input.focus();
+      return;
+    }
+    addMemo(v);
+    input.value = "";
+    input.focus();
+  };
+
+  addBtn.addEventListener("click", submit);
+  input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") submit();
+  });
+  if (clearBtn) clearBtn.addEventListener("click", clearMemo);
+  renderMemo();
+}
+
+initMemo();

@@ -88,3 +88,44 @@ h1 { font-size: 1.3rem; margin: 0; }
 .list li:last-child { border-bottom: none; }
 .error { color: #721c24; }
 .hidden { display: none; }
+.note {
+  font-size: 0.75rem;
+  color: #888;
+  margin: -4px 0 10px;
+}
+.memo-input { gap: 8px; margin-bottom: 10px; }
+.memo-input input {
+  flex: 1;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background: #6f4e37;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn:hover { background: #5a3f2c; }
+.memo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.link-btn:hover { color: #555; }
+#memo-clear { margin-top: 8px; }

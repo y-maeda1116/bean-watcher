@@ -38,6 +38,17 @@
     <ul id="purchases" class="list"></ul>
   </section>
 
+  <section id="memo-card" class="card">
+    <h2>📝 買った袋数メモ</h2>
+    <p class="note">このブラウザにのみ保存されます。本番の残量・通知には反映されません。</p>
+    <div class="row memo-input">
+      <input id="memo-bags" type="number" min="1" step="1" inputmode="numeric" placeholder="袋数" aria-label="袋数" />
+      <button id="memo-add" type="button" class="btn">記録</button>
+    </div>
+    <ul id="memo-list" class="list memo-list"></ul>
+    <button id="memo-clear" type="button" class="link-btn">全消去</button>
+  </section>
+
   <section id="maint-card" class="card hidden">
     <h2>🧽 メンテナンス</h2>
     <div class="row"><span class="label">クエン酸洗浄</span><span id="descaling-status" class="maint"></span></div>
